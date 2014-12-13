@@ -21,11 +21,12 @@ class WalletActor extends Actor with ActorLogging {
   var balance: Option[Coin] = _
 
   override def preStart() = {
+    val conf = ConfigFactory.load()
     params = MainNetParams.get
     chainStore = new MemoryBlockStore(params)
     chain = new BlockChain(params, chainStore)
 
-    wallet = Wallet.fromWatchingKey(params, DeterministicKey.deserializeB58(null, ConfigFactory.load().getString("watchingKey")))
+    wallet = Wallet.fromWatchingKey(params, DeterministicKey.deserializeB58(null, conf.getString("watchingKey")))
 
     for( i <- 1 to 10){
       wallet.freshReceiveAddress()
