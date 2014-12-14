@@ -3,25 +3,20 @@ package com.wlangiewicz.blockchainwriter.actors
 import java.net.InetAddress
 
 import akka.actor._
-import akka.event.Logging
 import com.typesafe.config.ConfigFactory
 import org.bitcoinj.core._
 import org.bitcoinj.crypto.DeterministicKey
-import org.bitcoinj.net.discovery.DnsDiscovery
 import org.bitcoinj.params.MainNetParams
 import org.bitcoinj.store.MemoryBlockStore
 
-case class Balance(c: Coin)
-
 class WalletActor extends Actor with ActorLogging {
-  //val log = Logging(context.system, this)
 
   var params: NetworkParameters = _
   var chainStore: MemoryBlockStore = _
   var chain: BlockChain = _
   var wallet: Wallet = _
   var peers: PeerGroup = _
-  var balance: Option[Coin] = _
+  var balance: Option[String] = _
 
   override def preStart() = {
     val conf = ConfigFactory.load()
@@ -31,14 +26,10 @@ class WalletActor extends Actor with ActorLogging {
 
     wallet = Wallet.fromWatchingKey(params, DeterministicKey.deserializeB58(null, conf.getString("watchingKey")))
 
-    for (i <- 1 to 10) {
-      wallet.freshReceiveAddress()
-    }
-
     log.error(wallet.toString)
 
     peers = new PeerGroup(params, chain)
-    peers.addPeerDiscovery(new DnsDiscovery(params))
+    //peers.addPeerDiscovery(new DnsDiscovery(params))
     peers.setUseLocalhostPeerWhenPossible(true)
     peers.addAddress(new PeerAddress(InetAddress.getByName("192.168.56.101"), 8333)) //btcd running in my local network
 
@@ -48,16 +39,19 @@ class WalletActor extends Actor with ActorLogging {
 
     peers.startAsync
     peers.awaitRunning()
-    peers.downloadBlockChain()
+    peers.startBlockChainDownload(new DownloadListener)
 
-    log.error(wallet.toString)
-
-    balance = Some(wallet.getWatchedBalance)
-
-    log.error(s"balance: ${balance.get}")
+    balance = Some(wallet.getWatchedBalance.toFriendlyString)
   }
 
   def receive = {
-    case Balance => sender ! balance.getOrElse(Coin.NEGATIVE_SATOSHI)
+    case "walletInfo" =>
+      sender ! balance.getOrElse(Coin.NEGATIVE_SATOSHI)
+    case "newReceiveAddress" =>
+      sender ! wallet.freshReceiveAddress().toString
+    case "getHeight" =>
+      sender ! wallet.getLastBlockSeenHeight.toString
+    case "test" =>
+      sender ! System.currentTimeMillis.toString
   }
 }

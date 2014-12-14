@@ -2,8 +2,6 @@ import sbtassembly.Plugin.AssemblyKeys._
 
 assemblySettings
 
-scalariformSettings
-
 jarName in assembly := "blockchainwriter.jar"
 
 name := "blockchainwriter"
