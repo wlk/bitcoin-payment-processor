@@ -87,5 +87,7 @@ class WalletActor extends Actor with ActorLogging {
       sender ! System.currentTimeMillis.toString
     case "getReceiveAddressCount" =>
       sender ! wallet.getKeychainSize.toString
+    case "getAllAddresses" =>
+      sender ! wallet.serializeKeychainToProtobuf().toString
   }
 }
