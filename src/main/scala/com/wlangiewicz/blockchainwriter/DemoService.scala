@@ -1,5 +1,7 @@
 package com.wlangiewicz.blockchainwriter
 
+import com.wlangiewicz.blockchainwriter.actors.WalletActor
+
 import scala.concurrent.ExecutionContextExecutor
 import akka.actor._
 import spray.routing.HttpService
@@ -13,11 +15,14 @@ trait DemoService extends HttpService {
 
   implicit def executionContext: ExecutionContextExecutor = actorRefFactory.dispatcher
 
+  val wallet = ActorSystem("blockchain-writer").actorOf(Props[WalletActor], "wallet")
+
   val demoRoute = {
     get {
-        path("walletInfo") {
-          complete ("INFO")
-        }
+      path("walletInfo") {
+        wallet ! "abc"
+        complete("DDD")
       }
+    }
   }
 }

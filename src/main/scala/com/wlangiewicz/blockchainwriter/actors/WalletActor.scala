@@ -1,6 +1,9 @@
 package com.wlangiewicz.blockchainwriter.actors
 
+import java.net.InetAddress
+
 import akka.actor._
+import akka.event.Logging
 import com.typesafe.config.ConfigFactory
 import org.bitcoinj.core._
 import org.bitcoinj.crypto.DeterministicKey
@@ -10,8 +13,8 @@ import org.bitcoinj.store.MemoryBlockStore
 
 case class Balance(c: Coin)
 
-
 class WalletActor extends Actor with ActorLogging {
+  //val log = Logging(context.system, this)
 
   var params: NetworkParameters = _
   var chainStore: MemoryBlockStore = _
@@ -28,15 +31,16 @@ class WalletActor extends Actor with ActorLogging {
 
     wallet = Wallet.fromWatchingKey(params, DeterministicKey.deserializeB58(null, conf.getString("watchingKey")))
 
-    for( i <- 1 to 10){
+    for (i <- 1 to 10) {
       wallet.freshReceiveAddress()
     }
 
-    Console.println(wallet)
+    log.error(wallet.toString)
 
-    peers  = new PeerGroup(params, chain)
+    peers = new PeerGroup(params, chain)
     peers.addPeerDiscovery(new DnsDiscovery(params))
     peers.setUseLocalhostPeerWhenPossible(true)
+    peers.addAddress(new PeerAddress(InetAddress.getByName("192.168.56.101"), 8333)) //btcd running in my local network
 
     chain.addWallet(wallet)
     peers.addWallet(wallet)
@@ -46,7 +50,11 @@ class WalletActor extends Actor with ActorLogging {
     peers.awaitRunning()
     peers.downloadBlockChain()
 
+    log.error(wallet.toString)
+
     balance = Some(wallet.getWatchedBalance)
+
+    log.error(s"balance: ${balance.get}")
   }
 
   def receive = {
