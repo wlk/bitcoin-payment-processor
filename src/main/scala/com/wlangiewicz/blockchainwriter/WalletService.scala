@@ -51,6 +51,13 @@ trait WalletService extends HttpService {
               Await.result(actor ? "test", timeout.duration).asInstanceOf[String]
             }
           }
+        } ~
+        path("getReceiveAddressCount") {
+          complete{
+            Future[String]{
+              Await.result(actor ? "getReceiveAddressCount", timeout.duration).asInstanceOf[String]
+            }
+          }
         }
     }
   }
