@@ -7,7 +7,7 @@ import com.wlangiewicz.blockchainwriter.actors.WalletActor
 import spray.routing.HttpService
 
 import scala.concurrent.duration._
-import scala.concurrent.{ Await, ExecutionContextExecutor }
+import scala.concurrent.{Future, Await, ExecutionContextExecutor}
 
 class WalletServiceActor extends Actor with WalletService {
   def actorRefFactory = context
@@ -15,36 +15,42 @@ class WalletServiceActor extends Actor with WalletService {
 }
 
 trait WalletService extends HttpService {
-  implicit val timeout = Timeout(5 minutes)
-
   implicit def executionContext: ExecutionContextExecutor = actorRefFactory.dispatcher
   val actor = actorRefFactory.actorOf(Props[WalletActor])
+  implicit val timeout = Timeout(5 minutes)
 
   val route = {
     get {
       path("walletInfo") {
-        val future = actor ? "walletInfo"
-        val result = Await.result(future, timeout.duration).asInstanceOf[String]
-
-        complete("balance: " + result)
+        complete{
+          Future[String]{
+            val result = Await.result(actor ? "walletInfo", timeout.duration).asInstanceOf[String]
+            s"walletInfo: $result"
+          }
+        }
       } ~
         path("newReceiveAddress") {
-          val future = actor ? "newReceiveAddress"
-          val result = Await.result(future, timeout.duration).asInstanceOf[String]
-
-          complete("newAddress: " + result)
+          complete{
+            Future[String]{
+              val result = Await.result(actor ? "newReceiveAddress", timeout.duration).asInstanceOf[String]
+              s"newReceiveAddress: $result"
+            }
+          }
         } ~
         path("getHeight") {
-          val future = actor ? "getHeight"
-          val result = Await.result(future, timeout.duration).asInstanceOf[String]
-
-          complete("getHeight: " + result)
+          complete{
+            Future[String]{
+              val result = Await.result(actor ? "getHeight", timeout.duration).asInstanceOf[String]
+              s"getHeight: $result"
+            }
+          }
         } ~
         path("test") {
-          val future = actor ? "test"
-          val result = Await.result(future, timeout.duration).asInstanceOf[String]
-
-          complete(result)
+          complete{
+            Future[String]{
+              Await.result(actor ? "test", timeout.duration).asInstanceOf[String]
+            }
+          }
         }
     }
   }

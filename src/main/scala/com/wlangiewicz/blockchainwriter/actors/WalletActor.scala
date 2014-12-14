@@ -6,6 +6,7 @@ import akka.actor._
 import com.typesafe.config.ConfigFactory
 import org.bitcoinj.core._
 import org.bitcoinj.crypto.DeterministicKey
+import org.bitcoinj.net.discovery.DnsDiscovery
 import org.bitcoinj.params.MainNetParams
 import org.bitcoinj.store.MemoryBlockStore
 
@@ -29,7 +30,7 @@ class WalletActor extends Actor with ActorLogging {
     log.error(wallet.toString)
 
     peers = new PeerGroup(params, chain)
-    //peers.addPeerDiscovery(new DnsDiscovery(params))
+    peers.addPeerDiscovery(new DnsDiscovery(params))
     peers.setUseLocalhostPeerWhenPossible(true)
     peers.addAddress(new PeerAddress(InetAddress.getByName("192.168.56.101"), 8333)) //btcd running in my local network
 
