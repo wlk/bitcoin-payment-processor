@@ -7,11 +7,13 @@ import java.util.concurrent.TimeUnit
 import akka.actor._
 import com.typesafe.config.ConfigFactory
 import org.bitcoinj.core._
+import org.bitcoinj.core.{Address => BitcoinAddress}
 import org.bitcoinj.crypto.DeterministicKey
 import org.bitcoinj.net.discovery.DnsDiscovery
 import org.bitcoinj.params.MainNetParams
 import org.bitcoinj.store.{WalletProtobufSerializer, SPVBlockStore, MemoryBlockStore}
 import org.bitcoinj.wallet.{Protos, KeyChainGroup}
+import scala.collection.JavaConversions._
 
 class WalletActor extends Actor with ActorLogging {
   var params: NetworkParameters = _
@@ -88,6 +90,6 @@ class WalletActor extends Actor with ActorLogging {
     case "getReceiveAddressCount" =>
       sender ! wallet.getKeychainSize.toString
     case "getAllAddresses" =>
-      sender ! wallet.serializeKeychainToProtobuf().toString
+      sender ! wallet.serializeKeychainToProtobuf().map(k => new BitcoinAddress(params, k.getPublicKey.toByteArray)).mkString("\n")
   }
 }
