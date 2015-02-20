@@ -1,4 +1,4 @@
-package com.wlangiewicz.blockchainwriter.actors
+package com.wlangiewicz.bitcoinpaymentprocessor.actors
 
 import java.io.{FileInputStream, File}
 import java.net.InetAddress

@@ -1,13 +1,15 @@
-package com.wlangiewicz.blockchainwriter
+package com.wlangiewicz.bitcoinpaymentprocessor
 
 import akka.actor._
 import akka.pattern.ask
 import akka.util.Timeout
-import com.wlangiewicz.blockchainwriter.actors.WalletActor
+import com.wlangiewicz.bitcoinpaymentprocessor.actors.WalletActor
 import spray.routing.HttpService
 
 import scala.concurrent.duration._
 import scala.concurrent.{Future, Await, ExecutionContextExecutor}
+
+import scala.language.postfixOps
 
 class WalletServiceActor extends Actor with WalletService {
   def actorRefFactory = context

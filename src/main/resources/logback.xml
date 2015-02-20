@@ -27,11 +27,11 @@
         </filter>
     </appender>
 
-    <logger name="com.wlangiewicz.blockchainwriter" level="ERROR">
+    <logger name="com.wlangiewicz.bitcoinpaymentprocessor" level="ERROR">
         <appender-ref ref="STDOUT"/>
     </logger>
 
-    <logger name="com.wlangiewicz.blockchainwriter" level="DEBUG">
+    <logger name="com.wlangiewicz.bitcoinpaymentprocessor" level="DEBUG">
         <appender-ref ref="FILE"/>
     </logger>
 </configuration>

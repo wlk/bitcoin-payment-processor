@@ -1,4 +1,4 @@
-package com.wlangiewicz.blockchainwriter
+package com.wlangiewicz.bitcoinpaymentprocessor
 
 import akka.actor.{ ActorSystem, Props }
 import akka.io.IO

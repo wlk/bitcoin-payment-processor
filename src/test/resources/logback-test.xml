@@ -17,7 +17,7 @@
         </filter>
     </appender>
 
-    <logger name="com.wlangiewicz.blockchainwriter" level="DEBUG">
+    <logger name="com.wlangiewicz.bitcoinpaymentprocessor" level="DEBUG">
         <appender-ref ref="FILE"/>
     </logger>
 </configuration>
