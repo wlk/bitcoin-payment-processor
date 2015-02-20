@@ -54,7 +54,6 @@ class WalletActor extends Actor with ActorLogging {
 
   override def preStart() = {
     params = MainNetParams.get
-    //chainStore = new MemoryBlockStore(params)
     walletFile = new File("wallet.wallet")
     val chainStore: SPVBlockStore = new SPVBlockStore(params, new File("wallet.spvchain"))
     chain = new BlockChain(params, chainStore)

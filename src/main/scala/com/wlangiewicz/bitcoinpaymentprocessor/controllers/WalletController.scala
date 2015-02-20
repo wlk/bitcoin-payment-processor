@@ -1,8 +1,13 @@
 package com.wlangiewicz.bitcoinpaymentprocessor.controllers
 
-import com.wlangiewicz.bitcoinpaymentprocessor.{NewPaymentResponse, NewPaymentRequest}
+import akka.actor.Props
+import com.wlangiewicz.bitcoinpaymentprocessor._
+import com.wlangiewicz.bitcoinpaymentprocessor.actors.WalletActor
 
-class WalletController {
+trait WalletController {
+  this: PaymentProcessorBase =>
+  val walletActor = system.actorOf(Props[WalletActor], "wallet")
+
   def newPayment(request: NewPaymentRequest): NewPaymentResponse = ???
 
 }

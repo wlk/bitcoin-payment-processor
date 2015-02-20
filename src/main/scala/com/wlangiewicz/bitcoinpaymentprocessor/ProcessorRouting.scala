@@ -12,17 +12,22 @@ import scala.concurrent.{Future, Await, ExecutionContextExecutor}
 
 import scala.language.postfixOps
 
-class WalletServiceActor extends Actor with WalletService {
+class PaymentProcessorActor extends Actor with ProcessorRouting {
+  this: PaymentProcessorBase =>
+  implicit val system = ActorSystem("payment-processor")
+
   def actorRefFactory = context
+
 
   def receive = runRoute(route)
 }
 
-trait WalletService extends HttpService with JsonFormats with BitcoinPaymentControllers {
+trait ProcessorRouting extends HttpService with JsonFormats with BitcoinPaymentControllers {
+  this: PaymentProcessorBase =>
   implicit def executionContext: ExecutionContextExecutor = actorRefFactory.dispatcher
 
-  val actor = actorRefFactory.actorOf(Props[WalletActor])
-  implicit val timeout = Timeout(5 minutes)
+  val actor = actorRefFactory.actorOf(Props[WalletActor], "wallet")
+  implicit val timeout = Timeout(5 seconds)
 
   val route = {
     path("newPayment") {
