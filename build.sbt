@@ -8,9 +8,7 @@ name := "Bitcoin Payment Processor"
 
 version := "1.0"
 
-scalaVersion := "2.11.4"
-
-scalacOptions := Seq("-unchecked", "-deprecation", "-encoding", "utf8")
+scalaVersion := "2.11.5"
 
 resolvers += "spray repo" at "http://repo.spray.io"
 
@@ -31,13 +29,10 @@ libraryDependencies <<= scalaVersion {   scala_version =>
     "io.spray"                 %% "spray-util"                           % sprayVersion,
     "io.spray"                 %% "spray-client"                         % sprayVersion,
     "org.bitcoinj" % "bitcoinj-core" % "0.12.2",
-    "org.scala-sbt" % "command" % "0.13.6",
-    "org.slf4j" % "slf4j-api" % "1.7.7",
-    "org.slf4j" % "log4j-over-slf4j" % "1.7.7",
+    "org.slf4j" % "slf4j-api" % "1.7.10",
     "ch.qos.logback" % "logback-classic" % "1.1.2",
+    "org.clapper"              %% "grizzled-slf4j"                       % "1.0.2",
     "com.typesafe" % "config" % "1.2.1",
-    "io.dropwizard.metrics" % "metrics-core" % "3.1.0",
-    "io.dropwizard.metrics" % "metrics-jvm" % "3.1.0",
     "org.scalatest" % "scalatest_2.11" % "2.2.1" % "test"
   )
 }

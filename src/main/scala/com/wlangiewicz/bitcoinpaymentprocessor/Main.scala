@@ -1,10 +1,10 @@
 package com.wlangiewicz.bitcoinpaymentprocessor
 
-import akka.actor.{ ActorSystem, Props }
+import akka.actor.{ActorSystem, Props}
 import akka.io.IO
 import spray.can.Http
 
-object Boot extends App {
+object Main extends App {
   implicit val system = ActorSystem("blockchain-writer")
 
   val service = system.actorOf(Props[WalletServiceActor], "service")
