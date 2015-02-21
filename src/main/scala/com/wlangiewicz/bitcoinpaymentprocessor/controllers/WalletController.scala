@@ -12,8 +12,7 @@ import scala.concurrent.Await
 import scala.language.postfixOps
 
 trait WalletController extends PaymentProcessorBase {
-  val walletActor = system.actorOf(Props[WalletActor], "wallet")
-  implicit val timeout = Timeout(5 seconds)
+  implicit val timeout = Timeout(15 seconds)
 
   def newPayment(request: NewPaymentRequest): NewPaymentResponse = {
     val result = Await.result(walletActor ? "newReceiveAddress", timeout.duration).asInstanceOf[String]

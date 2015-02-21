@@ -26,7 +26,6 @@ trait ProcessorRouting extends HttpService with JsonFormats with BitcoinPaymentC
   this: PaymentProcessorBase =>
   implicit def executionContext: ExecutionContextExecutor = actorRefFactory.dispatcher
 
-  val actor = actorRefFactory.actorOf(Props[WalletActor], "wallet")
   implicit val timeout = Timeout(5 seconds)
 
   val route = {
@@ -43,7 +42,7 @@ trait ProcessorRouting extends HttpService with JsonFormats with BitcoinPaymentC
         path("walletInfo") {
           complete {
             Future[String] {
-              val result = Await.result(actor ? "walletInfo", timeout.duration).asInstanceOf[String]
+              val result = Await.result(walletActor ? "walletInfo", timeout.duration).asInstanceOf[String]
               s"walletInfo: $result"
             }
           }
@@ -51,7 +50,7 @@ trait ProcessorRouting extends HttpService with JsonFormats with BitcoinPaymentC
           path("newReceiveAddress") {
             complete {
               Future[String] {
-                val result = Await.result(actor ? "newReceiveAddress", timeout.duration).asInstanceOf[String]
+                val result = Await.result(walletActor ? "newReceiveAddress", timeout.duration).asInstanceOf[String]
                 s"newReceiveAddress: $result"
               }
             }
@@ -59,7 +58,7 @@ trait ProcessorRouting extends HttpService with JsonFormats with BitcoinPaymentC
           path("getHeight") {
             complete {
               Future[String] {
-                val result = Await.result(actor ? "getHeight", timeout.duration).asInstanceOf[String]
+                val result = Await.result(walletActor ? "getHeight", timeout.duration).asInstanceOf[String]
                 s"getHeight: $result"
               }
             }
@@ -67,14 +66,14 @@ trait ProcessorRouting extends HttpService with JsonFormats with BitcoinPaymentC
           path("test") {
             complete {
               Future[String] {
-                Await.result(actor ? "test", timeout.duration).asInstanceOf[String]
+                Await.result(walletActor ? "test", timeout.duration).asInstanceOf[String]
               }
             }
           } ~
           path("getReceiveAddressCount") {
             complete {
               Future[String] {
-                Await.result(actor ? "getReceiveAddressCount", timeout.duration).asInstanceOf[String]
+                Await.result(walletActor ? "getReceiveAddressCount", timeout.duration).asInstanceOf[String]
               }
             }
           }
