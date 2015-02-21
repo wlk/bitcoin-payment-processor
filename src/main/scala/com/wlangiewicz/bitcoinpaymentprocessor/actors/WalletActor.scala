@@ -6,6 +6,8 @@ import java.util.concurrent.TimeUnit
 
 import akka.actor._
 import com.typesafe.config.ConfigFactory
+import com.wlangiewicz.bitcoinpaymentprocessor.NewPaymentRequest
+import com.wlangiewicz.bitcoinpaymentprocessor.actors.WalletActor.RegisterCallback
 import org.bitcoinj.core._
 import org.bitcoinj.core.{Address => BitcoinAddress}
 import org.bitcoinj.crypto.DeterministicKey
@@ -14,6 +16,12 @@ import org.bitcoinj.params.MainNetParams
 import org.bitcoinj.store.{WalletProtobufSerializer, SPVBlockStore, MemoryBlockStore}
 import org.bitcoinj.wallet.{Protos, KeyChainGroup}
 import scala.collection.JavaConversions._
+
+object WalletActor {
+
+  case class RegisterCallback(paymentRequest: NewPaymentRequest, address: String)
+
+}
 
 class WalletActor extends Actor with ActorLogging {
   var params: NetworkParameters = _
@@ -77,6 +85,17 @@ class WalletActor extends Actor with ActorLogging {
     balance = Some(wallet.getWatchedBalance.toFriendlyString)
   }
 
+  def registerCallback(request: NewPaymentRequest, address: String) = {
+    wallet.addEventListener(new AbstractWalletEventListener() {
+      override def onCoinsReceived(w: Wallet, tx: Transaction, prevBalance: Coin, newBalance: Coin) {
+        val value: Coin = tx.getValueSentToMe(w)
+        System.out.println("Received tx for " + value.toFriendlyString + ": " + tx)
+        System.out.println("Transaction will be forwarded after it confirms.")
+      }
+    }
+    )
+  }
+
   def receive = {
     case "walletInfo" =>
       sender ! balance.getOrElse(Coin.NEGATIVE_SATOSHI)
@@ -90,5 +109,8 @@ class WalletActor extends Actor with ActorLogging {
       sender ! wallet.getKeychainSize.toString
     case "getAllAddresses" =>
       sender ! wallet.serializeKeychainToProtobuf().map(k => new BitcoinAddress(params, k.getPublicKey.toByteArray)).mkString("\n")
+    case RegisterCallback(newPayment, address) =>
+      registerCallback(newPayment, address)
+      sender ! "ok"
   }
 }
