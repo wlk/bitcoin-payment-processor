@@ -14,7 +14,7 @@ import scala.language.postfixOps
 
 class PaymentProcessorActor extends Actor with ProcessorRouting {
   this: PaymentProcessorBase =>
-  implicit val system = ActorSystem("payment-processor")
+  override implicit lazy val system = ActorSystem("payment-processor")
 
   def actorRefFactory = context
 
@@ -22,9 +22,12 @@ class PaymentProcessorActor extends Actor with ProcessorRouting {
   def receive = runRoute(route)
 }
 
-trait ProcessorRouting extends HttpService with JsonFormats with BitcoinPaymentControllers {
-  this: PaymentProcessorBase =>
+trait ProcessorRouting extends HttpService with JsonFormats with BitcoinPaymentControllers  {
   implicit def executionContext: ExecutionContextExecutor = actorRefFactory.dispatcher
+  implicit lazy val system = ActorSystem("payment-processor")
+
+  val walletActor = SingleActorExtension(system).walletActor
+
 
   implicit val timeout = Timeout(5 seconds)
 

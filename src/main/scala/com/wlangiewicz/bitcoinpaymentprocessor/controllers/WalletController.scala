@@ -11,8 +11,10 @@ import scala.concurrent.duration._
 import scala.concurrent.Await
 import scala.language.postfixOps
 
-trait WalletController extends PaymentProcessorBase {
+trait WalletController extends PaymentProcessorBase  {
   implicit val timeout = Timeout(15 seconds)
+
+  val walletActor = SingleActorExtension(system).walletActor
 
   def newPayment(request: NewPaymentRequest): NewPaymentResponse = {
     val result = Await.result(walletActor ? "newReceiveAddress", timeout.duration).asInstanceOf[String]
